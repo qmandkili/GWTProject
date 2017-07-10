@@ -1,7 +1,10 @@
 package com.rest.server;
 
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,34 +34,32 @@ public class RestExample {
 		return device;
 	}
 	
+	@RequestMapping(value = "/device/get/{id}", method = RequestMethod.GET)
+	public Device getDevice(@PathVariable("id") BigInteger id) {
+		DBWorker dbWorker = new DBWorker();
+		return dbWorker.getDevice(id);		
+	}
+	
 	@RequestMapping(value = "/device/get", method = RequestMethod.GET)
-	public Device getDevice(@RequestBody BigInteger id) {
-		Device result = new Device(id, "idName", "idDesc");
-		/*DBWorker dbWorker = new DBWorker();
-		Device result = dbWorker.getDevice(device.getId());
-		Device dev = new Device(device.getId(), "name", "desc");
-		Device result = dbWorker.getDevice(device.getId());
-		Device device = new Device();
-		device.setId(1);
-		device.setName("secondDevice");
-		device.setDescription("secondDescription");*/
-		//dbWorker.closeConnection();
-		return result;		
+	public List<Device> getAllDevices() {
+		DBWorker dbWorker = new DBWorker();
+		return dbWorker.getAllDevices();
+		/*List<Device> list = new ArrayList<Device>();
+		list.add(new Device(BigInteger.valueOf(10), "testName", "testDesc"));
+		return list;*/
 	}
 	
 	@RequestMapping(value = "/device/delete", method = RequestMethod.DELETE)
-	public Device deleteDevice(@RequestBody BigInteger id) {
-		/*DBWorker dbWorker = new DBWorker();
-		dbWorker.deleteDevice(device);
-		device.setName("deviceName");*/
-		//Device result = new Device(BigInteger.valueOf(obj.getLong("id")), obj.getString("name"), "");
-		return new Device(id, "delete", "");
+	public String deleteDevice(@RequestBody BigInteger id) {
+		DBWorker dbWorker = new DBWorker();
+		dbWorker.deleteDevice(id);
+		return "Device successfully deleted";
 	}
 	
 	@RequestMapping(value = "/device/update", method = RequestMethod.PUT)
 	public Device updateDevice(@RequestBody Device device) {
-		/*DBWorker dbWorker = new DBWorker();
-		dbWorker.updateDevice(device);*/
+		DBWorker dbWorker = new DBWorker();
+		dbWorker.updateDevice(device);
 		return device;
 	}
 

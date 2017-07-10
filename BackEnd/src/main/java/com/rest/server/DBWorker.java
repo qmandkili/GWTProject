@@ -1,15 +1,15 @@
 package com.rest.server;
 
-import java.awt.List;
-import java.beans.Statement;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import com.model.shared.Device;
@@ -49,35 +49,33 @@ public class DBWorker {
 		try {
 			conn.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 		}
 	}
 
 	public void addDevice(Device device) {
-		String insertDeviceQuery = "insert into device(id, name, description)" + "values (?, ?, ?);";
+		String insertDeviceQuery = "insert into device(name, description)" + "values (?, ?);";
 		try {
 			PreparedStatement statement = conn.prepareStatement(insertDeviceQuery);
-
-			statement.setBigDecimal(1, BigDecimal.valueOf(device.getId().longValue()));
-			statement.setString(2, device.getName());
-			statement.setString(3, device.getDescription());
+			statement.setString(1, device.getName());
+			statement.setString(2, device.getDescription());
 			statement.executeUpdate();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 		}
-		/*
-		 * session = sessionFactory.openSession(); session.beginTransaction();
-		 * session.save(device); session.getTransaction().commit();
-		 */
 	}
 
-	public List getAllDevices() {
-		/*
-		 * session = sessionFactory.openSession(); session.beginTransaction();
-		 * List devices = (List) session.createQuery("from Device").list();
-		 * session.getTransaction().commit(); return devices;
-		 */
-		return null;
+	public List<Device> getAllDevices() {
+		List<Device> result = new ArrayList<Device>();
+		String selectAllDevicesQuery = "select * from device;";
+		try {
+			PreparedStatement statement = conn.prepareStatement(selectAllDevicesQuery);
+			ResultSet rs = statement.executeQuery();
+			while (rs.next()) {
+				result.add(new Device(BigInteger.valueOf(Long.parseLong(rs.getString(1).toString())),
+						rs.getString(2), rs.getString(3)));
+			}
+		} catch (SQLException e) {
+		}
+		return result;
 	}
 
 	public Device getDevice(BigInteger id) {
@@ -85,48 +83,36 @@ public class DBWorker {
 		String selectDeviceQuery = "select * from device where id = ?;";
 		try {
 			PreparedStatement statement = conn.prepareStatement(selectDeviceQuery);
-			statement.setBigDecimal(1, new BigDecimal(id));
-			ResultSet rs = statement.executeQuery(selectDeviceQuery);
+			statement.setInt(1, id.intValue());
+			ResultSet rs = statement.executeQuery();
 			while (rs.next()) {
-				device = new Device(rs.getBigDecimal("id").toBigInteger(), rs.getString("name"),
-						rs.getString("description"));
+				device = new Device(id, 
+						rs.getString(2), rs.getString(3));
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 		}
-		/*
-		 * session = sessionFactory.openSession(); session.beginTransaction();
-		 * Device device = session.get(Device.class, id);
-		 * session.getTransaction().commit(); return device;
-		 */
 		return device;
 	}
 
 	public void updateDevice(Device device) {
-		/*
-		 * session = sessionFactory.openSession(); session.beginTransaction();
-		 * session.update(device); session.getTransaction().commit();
-		 */
-		String updateDeviceQuery = "update into device(id, name, description)" + "values (?, ?, ?);";
+		String updateDeviceQuery = "update device set name = ?, description = ? where id = ?;";
 		try {
-			PreparedStatement statement = conn.prepareStatement(updateDeviceQuery);
-			statement.setBigDecimal(1, new BigDecimal(device.getId()));
-			statement.setString(2, device.getName());
-			statement.setString(3, device.getDescription());
+			PreparedStatement statement = conn.prepareStatement(updateDeviceQuery);			
+			statement.setString(1, device.getName());
+			statement.setString(2, device.getDescription());
+			statement.setBigDecimal(3, new BigDecimal(device.getId()));
 			statement.executeUpdate();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 		}
 	}
 
-	public void deleteDevice(Device device) {
+	public void deleteDevice(BigInteger id) {
 		String deleteDeviceQuery = "delete from device " + "where id = ?;";
 		try {
 			PreparedStatement statement = conn.prepareStatement(deleteDeviceQuery);
-			statement.setBigDecimal(1, new BigDecimal(device.getId()));
+			statement.setInt(1, id.intValue());
 			statement.executeUpdate();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 		}
 	}
 

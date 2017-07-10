@@ -8,12 +8,14 @@ import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 
 public interface WorkerClient extends RestService {
@@ -27,8 +29,12 @@ public interface WorkerClient extends RestService {
 	void post(Device device, MethodCallback<Device> callback);
 	
 	@GET
+	@Path("/device/get/{id}")
+	void getById(@PathParam("id") BigInteger id, MethodCallback<Device> callback);
+	
+	@GET
 	@Path("/device/get")
-	void getById(BigInteger id, MethodCallback<Device> callback);
+	void getAll(MethodCallback<List<Device>> callback);
 	
 	@PUT
 	@Path("/device/update")
@@ -36,6 +42,6 @@ public interface WorkerClient extends RestService {
 	
 	@DELETE
 	@Path("/device/delete")
-	void delete(BigInteger id, MethodCallback<Device> callback);
+	void delete(BigInteger id, MethodCallback<String> callback);
 
 }

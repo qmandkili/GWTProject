@@ -4,10 +4,10 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -16,6 +16,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.model.shared.Device;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.fusesource.restygwt.client.Defaults;
 import org.fusesource.restygwt.client.Method;
@@ -56,24 +58,33 @@ public class StartPoint implements EntryPoint {
 		 * // TODO Auto-generated method stub
 		 * label.setText(exception.getMessage()); } });
 		 */
+		
+		FlexTable table = new FlexTable();
+		table.setText(0, 0, "id");
+		table.setText(0, 1, "Name");
+		table.setText(0, 2, "Description");
+		table.setVisible(true);
 
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
 		
 		Button addButton = new Button("Add");
-		Button getButton = new Button("Get");
-		Button updateButton = new Button("Update");
-		Button deleteButton = new Button("Delete");
+		Button getButton = new Button("G+U+D");
+		Button updateTableButton = new Button("Update Table");
 		
 		horizontalPanel.add(addButton);
 		horizontalPanel.add(getButton);
-		horizontalPanel.add(updateButton);
-		horizontalPanel.add(deleteButton);
+		horizontalPanel.add(updateTableButton);
 		horizontalPanel.setVisible(true);
 		
 		TextBox idTextBox = new TextBox();
 		TextBox nameTextBox = new TextBox();
 		TextBox descriptionTextBox = new TextBox();
 		Button addDeviceButton = new Button("Add");
+		Button getDeviceButton = new Button("Get");
+		Button updateDeviceButton = new Button("Update");
+		Button deleteDeviceButton = new Button("Delete");
+		Button closeButton = new Button("Close");
+		
 
 		DialogBox addDialogBox = new DialogBox();
 		addDialogBox.setTitle("Add new device");
@@ -84,13 +95,46 @@ public class StartPoint implements EntryPoint {
 		addDialogBox.setVisible(true);
 		
 		VerticalPanel addTextPanel = new VerticalPanel();
-		addTextPanel.add(idTextBox);
 		addTextPanel.add(nameTextBox);
 		addTextPanel.add(descriptionTextBox);
 		addTextPanel.add(addDeviceButton);
 		addTextPanel.setVisible(true);
 		
 		addDialogBox.setWidget(addTextPanel);
+		
+		DialogBox getDialogBox = new DialogBox();
+		getDialogBox.setTitle("Get device");
+		getDialogBox.setHeight("200");
+		getDialogBox.setWidth("300");
+		getDialogBox.setAnimationEnabled(true);
+		getDialogBox.setGlassEnabled(true);
+		getDialogBox.setVisible(true);
+		
+		VerticalPanel getTextPanel = new VerticalPanel();
+		HorizontalPanel idInputPanel = new HorizontalPanel();
+		Label idLabel = new Label("id:");
+		idInputPanel.add(idLabel);
+		idInputPanel.add(idTextBox);
+		getTextPanel.add(idInputPanel);
+		getTextPanel.add(getDeviceButton);
+		HorizontalPanel nameInputPanel = new HorizontalPanel();
+		Label nameLabel = new Label("Name:");
+		nameInputPanel.add(nameLabel);
+		nameInputPanel.add(nameTextBox);
+		getTextPanel.add(nameInputPanel);
+		HorizontalPanel descInputPanel = new HorizontalPanel();
+		Label descLabel = new Label("Description:");
+		descInputPanel.add(descLabel);
+		descInputPanel.add(descriptionTextBox);
+		getTextPanel.add(descInputPanel);
+		HorizontalPanel buttonPanel = new HorizontalPanel();
+		buttonPanel.add(updateDeviceButton);
+		buttonPanel.add(deleteDeviceButton);
+		buttonPanel.add(closeButton);
+		getTextPanel.add(buttonPanel);
+		getTextPanel.setVisible(true);
+		
+		getDialogBox.setWidget(getTextPanel);
 		
 		addButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
@@ -100,7 +144,8 @@ public class StartPoint implements EntryPoint {
 		
 		addDeviceButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				client.post(new Device(BigInteger.valueOf(Long.parseLong(idTextBox.getText())), 
+				client.post(new Device(
+						null,
 						nameTextBox.getText(), descriptionTextBox.getText()),
 						new MethodCallback<Device>() {
 					@Override
@@ -119,10 +164,16 @@ public class StartPoint implements EntryPoint {
 				});
 			}
 		});		
-
+		
 		getButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				client.getById(BigInteger.valueOf(123), new MethodCallback<Device>() {
+				getDialogBox.show();
+			}
+		});
+
+		getDeviceButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				client.getById(BigInteger.valueOf(Long.parseLong(idTextBox.getText())), new MethodCallback<Device>() {
 					@Override
 					public void onFailure(Method method, Throwable exception) {
 						// TODO Auto-generated method stub
@@ -132,17 +183,45 @@ public class StartPoint implements EntryPoint {
 					@Override
 					public void onSuccess(Method method, Device response) {
 						// TODO Auto-generated method stub
-						Window.alert(response.toString());
+						//Window.alert(response.toString());
+						nameTextBox.setText(response.getName());
+						descriptionTextBox.setText(response.getDescription());
 					}
 				});
 			}
-		});		
-
-		Device updateDevice = new Device(BigInteger.valueOf(123), "sendDevice", "");
-
-		updateButton.addClickHandler(new ClickHandler() {
+		});
+		
+		updateTableButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				client.update(updateDevice, new MethodCallback<Device>() {
+				client.getAll(new MethodCallback<List<Device>>() {
+					@Override
+					public void onFailure(Method method, Throwable exception) {
+						// TODO Auto-generated method stub
+						Window.alert(exception.toString() + "\n" + exception.getMessage());
+					}
+
+					@Override
+					public void onSuccess(Method method, List<Device> response) {
+						for(int i = 0; i < response.size(); i++) {							
+							table.setText(i + 1, 0, response.get(i).getId().toString());
+							table.setText(i + 1, 1, response.get(i).getName());
+							table.setText(i + 1, 2, response.get(i).getDescription());
+						}
+					}
+				});
+			}
+		});
+		
+		closeButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				getDialogBox.hide();
+			}
+		});
+
+		updateDeviceButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				client.update(new Device(BigInteger.valueOf(Long.parseLong(idTextBox.getText())),
+						nameTextBox.getText(), descriptionTextBox.getText()), new MethodCallback<Device>() {
 					@Override
 					public void onFailure(Method method, Throwable exception) {
 						// TODO Auto-generated method stub
@@ -158,9 +237,9 @@ public class StartPoint implements EntryPoint {
 			}
 		});
 		
-		deleteButton.addClickHandler(new ClickHandler() {
+		deleteDeviceButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				client.delete(BigInteger.valueOf(123), new MethodCallback<Device>() {
+				client.delete(BigInteger.valueOf(Long.parseLong(idTextBox.getText())), new MethodCallback<String>() {
 					@Override
 					public void onFailure(Method method, Throwable exception) {
 						// TODO Auto-generated method stub
@@ -168,13 +247,15 @@ public class StartPoint implements EntryPoint {
 					}
 
 					@Override
-					public void onSuccess(Method method, Device response) {
+					public void onSuccess(Method method, String response) {
 						// TODO Auto-generated method stub
-						Window.alert(response.toString());
+						Window.alert(response);
 					}
 				});
 			}
 		});
+		
+		RootPanel.get().add(table);
 
 		RootPanel.get().add(horizontalPanel);
 
