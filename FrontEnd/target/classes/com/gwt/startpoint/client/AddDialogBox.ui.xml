@@ -1,0 +1,20 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+
+	</ui:style>
+	<g:HTMLPanel>		
+			<g:VerticalPanel>
+				<g:HorizontalPanel verticalAlignment="middle">
+					<g:Label text="Name:" />
+					<g:TextBox ui:field="nameTextBox" />
+				</g:HorizontalPanel>
+				<g:HorizontalPanel verticalAlignment="middle">
+					<g:Label text="Description:" />
+					<g:TextBox ui:field="descriptionTextBox" />
+				</g:HorizontalPanel>
+				<g:Button ui:field="addButton" text="Add" />
+			</g:VerticalPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 

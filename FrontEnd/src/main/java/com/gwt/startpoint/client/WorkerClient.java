@@ -26,7 +26,7 @@ public interface WorkerClient extends RestService {
 	
 	@POST
 	@Path("/device/create")
-	void post(Device device, MethodCallback<Device> callback);
+	void post(Device device, MethodCallback<String> callback);
 	
 	@GET
 	@Path("/device/get/{id}")
@@ -38,7 +38,7 @@ public interface WorkerClient extends RestService {
 	
 	@PUT
 	@Path("/device/update")
-	void update(Device device, MethodCallback<Device> callback);
+	void update(Device device, MethodCallback<String> callback);
 	
 	@DELETE
 	@Path("/device/delete")
